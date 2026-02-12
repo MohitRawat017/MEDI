@@ -1,0 +1,61 @@
+# ============================================================
+# WEB FRAMEWORK & SERVER
+# ============================================================
+fastapi
+uvicorn[standard]
+python-multipart  # Required for file uploads
+
+# ============================================================
+# LANGCHAIN ECOSYSTEM
+# ============================================================
+langchain
+langchain-community
+langchain-core
+langchain-groq
+langchain-pinecone
+langchain-text-splitters
+
+# ============================================================
+# VECTOR DATABASE
+# ============================================================
+pinecone
+
+# ============================================================
+# EMBEDDINGS & MODELS
+# ============================================================
+sentence-transformers
+huggingface-hub
+langchain-huggingface
+langchain-google-genai
+
+# ============================================================
+# PDF PARSING
+# ============================================================
+PyPDF  # Backend for PyPDFLoader
+
+# ============================================================
+# MACHINE LEARNING
+# ============================================================
+# PyTorch is required for GPU acceleration with sentence-transformers
+# For CUDA 12.6: pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+# For CPU-only: pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+torch
+
+# ============================================================
+# UTILITIES
+# ============================================================
+python-dotenv  # Environment variable management
+pydantic  # Data validation
+requests  # HTTP client
+tqdm  # Progress bars
+
+# ============================================================
+# INSTALLATION NOTES
+# ============================================================
+# To install all dependencies:
+#   pip install -r requirements.txt
+# Or with uv (faster):
+#   uv pip install -r requirements.txt
+#
+# For GPU support, install PyTorch separately first:
+#   pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu126

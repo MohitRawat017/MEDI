@@ -1,10 +1,149 @@
-# Python-generated files
+# ============================================================
+# PYTHON
+# ============================================================
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
 build/
 dist/
 wheels/
 *.egg-info
+*.egg
+.Python
 
 # Virtual environments
-.venv
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ============================================================
+# ENVIRONMENT & SECRETS
+# ============================================================
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+**/.env
+
+# ============================================================
+# LOGS
+# ============================================================
+*.log
+app.log
+logs/
+*.log.*
+
+# ============================================================
+# BACKEND SPECIFIC
+# ============================================================
+# Uploaded PDFs directory
+backend/uploaded_pdfs/
+uploaded_pdfs/
+
+# ============================================================
+# ML/AI MODELS & CACHE
+# ============================================================
+# Hugging Face cache
+.cache/
+*.pt
+*.pth
+*.onnx
+models/
+checkpoints/
+
+# Sentence Transformers cache
+.sentence_transformers/
+
+# PyTorch cache
+torch_cache/
+
+# ============================================================
+# IDE & EDITORS
+# ============================================================
+# VSCode
+.vscode/
+.history/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# ============================================================
+# FRONTEND (Node.js / React)
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+
+# Frontend build output
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/out/
+
+# ============================================================
+# OS SPECIFIC
+# ============================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ============================================================
+# TESTING & COVERAGE
+# ============================================================
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# ============================================================
+# AGENTS & TEMPORARY
+# ============================================================
+.agents/
+temp/
+tmp/
+*.tmp
+*.swp
+*.swo
+
+# ============================================================
+# DATABASE & FILES
+# ============================================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================================
+# PACKAGE MANAGERS
+# ============================================================
+uv.lock
+poetry.lock
+Pipfile.lock
