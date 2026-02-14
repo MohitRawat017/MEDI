@@ -81,7 +81,7 @@ def dense_retrieval(query: str, top_k: int = 7, namespace: str = "default") -> L
 
     # Query Pinecone
     results = index.query(
-        vectors=query_embedding.tolist(),
+        vector=query_embedding.tolist(),
         top_k=top_k,
         namespace=namespace,
         include_metadata=True

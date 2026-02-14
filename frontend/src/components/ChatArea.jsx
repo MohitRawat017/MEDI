@@ -91,8 +91,8 @@ const ChatArea = () => {
                     type="submit"
                     disabled={isLoading || !input.trim()}
                     className={`p-2 rounded-lg transition-colors ${isLoading || !input.trim()
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
                         }`}
                 >
                     <Send size={20} />

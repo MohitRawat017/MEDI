@@ -26,7 +26,7 @@ load_dotenv()
 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_ENV = "us-east-1"
-PINECONE_INDEX_NAME = "Medi"
+PINECONE_INDEX_NAME = "medi"    
 
 UPLOAD_DIR = "./uploaded_pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
