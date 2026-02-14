@@ -22,6 +22,7 @@ tests = [
     ("Pinecone Connection",       "test_pinecone.py"),
     ("LLM (Groq) Connection",     "test_llm.py"),
     ("API Endpoints",             "test_api_endpoints.py"),
+    ("Prescription Pipeline",     "test_prescription_pipeline.py"),
 ]
 
 def main():

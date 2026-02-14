@@ -40,4 +40,29 @@ export const askQuestion = async (question, namespace) => {
     return response.data;
 };
 
+export const uploadPrescription = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await api.post('/upload_prescription/', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};
+
+export const askPrescription = async (sessionId, question) => {
+    const formData = new FormData();
+    formData.append('session_id', sessionId);
+    formData.append('question', question);
+
+    const response = await api.post('/ask_prescription/', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};
+
 export default api;

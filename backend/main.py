@@ -18,7 +18,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from middlewares.exception_handler import catch_exception_middleware
 from routes.upload_pdf import router as upload_router
 from routes.ask_question import router as ask_router
-
+from routes.upload_prescription import router as upload_prescription_router
+from routes.ask_prescription import router as ask_prescription_router
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -52,3 +53,5 @@ app.middleware("http")(catch_exception_middleware)
 # Register API routes
 app.include_router(upload_router)  # PDF upload endpoint
 app.include_router(ask_router)  # Question answering endpoint
+app.include_router(upload_prescription_router) # Prescription upload endpoint
+app.include_router(ask_prescription_router) # Prescription question answering endpoint
