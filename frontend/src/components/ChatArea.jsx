@@ -31,10 +31,8 @@ const ChatArea = () => {
         setIsLoading(true);
 
         try {
-            // Ideally namespace should be dynamic or fixed. Assuming "medical" or derived from logic. 
-            // In backend ask_question takes 'namespace' form field.
-            // But where do we get it? Maybe hardcode for now or generic "medical_docs".
-            const response = await askQuestion(userMessage, "medical_docs");
+            // Namespace must match what's used during PDF upload (defaults to "default")
+            const response = await askQuestion(userMessage, "default");
 
             // Standardize response extraction. Backend returns { response: "answer", source: [...] }
             // or { response: "I'm sorry...", source: [] }
