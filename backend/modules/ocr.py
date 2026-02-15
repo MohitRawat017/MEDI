@@ -25,21 +25,27 @@ dtype = torch.float32 if device == "mps" else torch.bfloat16
 logger.info(f"[OCR] Using device: {device}")
 
 # -----------------------
-# Load Model
+# Lazy Model Loading
 # -----------------------
+# Model is loaded on first use, not at import time.
+# This prevents blocking the server startup.
 
-logger.info("[OCR] Loading LightOnOCR model...")
+_model = None
+_processor = None
 
-model = LightOnOcrForConditionalGeneration.from_pretrained(
-    MODEL_NAME,
-    torch_dtype=dtype
-).to(device)
 
-processor = LightOnOcrProcessor.from_pretrained(MODEL_NAME)
-
-model.eval()
-
-logger.info("[OCR] Model loaded successfully.")
+def _get_model():
+    global _model, _processor
+    if _model is None:
+        logger.info("[OCR] Loading LightOnOCR model (first request)...")
+        _model = LightOnOcrForConditionalGeneration.from_pretrained(
+            MODEL_NAME,
+            torch_dtype=dtype
+        ).to(device)
+        _processor = LightOnOcrProcessor.from_pretrained(MODEL_NAME)
+        _model.eval()
+        logger.info("[OCR] Model loaded successfully.")
+    return _model, _processor
 
 
 # =====================================================
@@ -53,6 +59,8 @@ def extract_text_from_image(image_path: str) -> str:
 
     try:
         logger.info(f"[OCR] Processing image: {image_path}")
+
+        model, processor = _get_model()
 
         image = Image.open(image_path).convert("RGB")
 

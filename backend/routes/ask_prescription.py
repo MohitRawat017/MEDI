@@ -2,6 +2,7 @@ from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
 from modules.session_store import get_session
 from modules.api_answer_chain import generate_api_answer
+from modules.evaluation import detect_hallucinations
 
 router = APIRouter()
 
@@ -12,18 +13,31 @@ async def ask_prescription(
     question: str = Form(...)
 ):
     try:
-        prescription_json = get_session(session_id)
+        session = get_session(session_id)
 
-        if not prescription_json:
+        if not session:
             return JSONResponse(
                 status_code=404,
                 content={"error": "Invalid session_id"}
             )
 
+        prescription_json = session["prescription"]
+        api_results = session.get("api_results", [])
+        confidence = session.get("confidence", {})
+
+        # Generate answer
         answer = generate_api_answer(prescription_json, question)
 
+        # Hallucination detection runs AFTER answer generation
+        # Does not modify answer, only flags risk
+        hallucination_check = detect_hallucinations(
+            answer, prescription_json, api_results
+        )
+
         return {
-            "answer": answer
+            "answer": answer,
+            "hallucination_check": hallucination_check,
+            "confidence": confidence
         }
 
     except Exception as e:

@@ -89,10 +89,11 @@ LLM Grounded Answer
 - 🔍 **Handwritten Prescription OCR** (LightOnOCR 2.1B)
 - 🧾 **Structured Prescription Parsing** (Pydantic Schema Validation)
 - 💊 **Drug Normalization & Standardization**
-- 🌐 **Live Drug Knowledge** via:
-  - RxNorm API
-  - DailyMed API
-- 🧠 **Deterministic Medical Answering**
+- 🌐 **Live Drug Knowledge** via RxNorm, DailyMed, RxClass, OpenFDA
+- 🧠 **Deterministic Medical Answering** (temperature=0)
+- ⚠️ **Drug Interaction Detection** (RxClass + LLM analysis)
+- 📊 **Confidence Scoring** (diagnosis, normalization, overall)
+- 🛡️ **Hallucination Detection** (post-answer grounding check)
 - 📚 **Optional Static Knowledge Base** (RAG with Pinecone)
 - ⚡ **FastAPI Backend**
 - 🧩 **Session-based Prescription Storage**
@@ -106,23 +107,27 @@ LLM Grounded Answer
 Medical_Chatbot/
 ├── backend/
 │   ├── modules/
-│   │   ├── ocr.py                    # OCR extraction
-│   │   ├── prescription_parser.py    # LLM-based parsing
-│   │   ├── medical_api.py            # RxNorm/DailyMed integration
-│   │   ├── api_answer_chain.py       # Prescription Q&A chain
-│   │   ├── session_store.py          # In-memory session storage
-│   │   ├── llm.py                    # RAG LLM
-│   │   ├── retrieval.py              # Pinecone retrieval + reranking
-│   │   └── load_vectorstore.py       # PDF ingestion
+│   │   ├── ocr.py                        # OCR extraction (lazy loading)
+│   │   ├── prescription_parser.py        # LLM-based parsing
+│   │   ├── medical_api.py                # RxNorm/DailyMed/RxClass/OpenFDA
+│   │   ├── api_answer_chain.py           # Prescription Q&A chain
+│   │   ├── confidence_scorer.py          # 🆕 Confidence scoring
+│   │   ├── drug_interaction_checker.py   # 🆕 Drug interaction detection
+│   │   ├── evaluation.py                 # 🆕 F1/grounding/hallucination
+│   │   ├── session_store.py              # Session storage + metadata
+│   │   ├── llm.py                        # RAG LLM
+│   │   ├── retrieval.py                  # Pinecone retrieval + reranking
+│   │   └── load_vectorstore.py           # PDF ingestion
 │   │
 │   ├── routes/
-│   │   ├── upload_prescription.py    # POST /upload_prescription/
-│   │   ├── ask_prescription.py       # POST /ask_prescription/
-│   │   ├── upload_pdf.py             # POST /upload_pdfs/
-│   │   └── ask_question.py           # POST /ask/
+│   │   ├── upload_prescription.py        # POST /upload_prescription/
+│   │   ├── ask_prescription.py           # POST /ask_prescription/
+│   │   ├── upload_pdf.py                 # POST /upload_pdfs/
+│   │   └── ask_question.py              # POST /ask/
 │   │
 │   ├── tests/
 │   │   ├── test_prescription_pipeline.py
+│   │   ├── test_evaluation.py            # 🆕 Evaluation metrics
 │   │   ├── test_api_endpoints.py
 │   │   └── run_all_tests.py
 │   │
@@ -132,8 +137,8 @@ Medical_Chatbot/
 └── frontend/
     ├── src/
     │   ├── components/
-    │   │   ├── PrescriptionUpload.jsx
-    │   │   ├── PrescriptionChat.jsx
+    │   │   ├── PrescriptionUpload.jsx     # + confidence & interactions UI
+    │   │   ├── PrescriptionChat.jsx       # + hallucination banners
     │   │   ├── FileUpload.jsx
     │   │   └── ChatArea.jsx
     │   ├── services/
@@ -160,10 +165,16 @@ file: <prescription_image>
 ```json
 {
   "session_id": "uuid-...",
-  "prescription_data": {
-    "patient_info": {...},
-    "diagnosis": "...",
-    "medications": [...]
+  "prescription_data": {"patient_info": {}, "diagnosis": "", "medications": []},
+  "interactions": {
+    "interactions": [{"drug_pair": ["A","B"], "risk_level": "High", "description": "..."}],
+    "disclaimer": "Advisory only"
+  },
+  "confidence": {
+    "overall_confidence": "Medium",
+    "diagnosis_confidence": "Medium",
+    "api_grounding_coverage": 85.0,
+    "medication_scores": []
   }
 }
 ```
@@ -233,7 +244,9 @@ namespace: "medical_kb"
 | API | Purpose | Auth Required |
 |-----|---------|---------------|
 | **RxNorm** | Drug normalization | ❌ No |
+| **RxClass** | Drug class lookup | ❌ No |
 | **DailyMed** | FDA drug label data | ❌ No |
+| **OpenFDA** | Adverse event signals | ❌ No |
 | **Pinecone** | Vector DB for RAG | ✅ Yes |
 | **Groq** | High-performance LLM inference | ✅ Yes |
 
@@ -320,15 +333,17 @@ Visit `http://localhost:5173` (frontend) and `http://localhost:8000/docs` (API d
 - [x] Live API Drug Grounding (RxNorm + DailyMed)
 - [x] React frontend with tab navigation
 
-### Phase 3 🚧
-- [ ] Drug interaction detection
-- [ ] Contraindication alerts
-- [ ] Persistent storage (Redis / PostgreSQL)
+### Phase 3 ✅
+- [x] Drug interaction detection (RxClass + LLM)
+- [x] Confidence scoring (diagnosis + normalization + grounding)
+- [x] Hallucination detection (post-answer grounding check)
+- [x] OpenFDA adverse event integration
+- [x] Evaluation framework (F1, grounding, hallucination metrics)
 
 ### Phase 4 🔮
+- [ ] Persistent storage (Redis / PostgreSQL)
 - [ ] Multi-visit longitudinal tracking
-- [ ] Confidence scoring for OCR output
-- [ ] OpenFDA adverse event integration
+- [ ] Contraindication alerts
 - [ ] Medical intent router (auto-select mode)
 
 ---
@@ -343,6 +358,9 @@ python run_all_tests.py
 
 # Run specific test
 python test_prescription_pipeline.py
+
+# Run evaluation metrics
+python test_evaluation.py
 ```
 
 **Test Coverage:**
@@ -351,6 +369,21 @@ python test_prescription_pipeline.py
 - LLM (Groq) connection
 - API endpoints (all 4)
 - Prescription pipeline (end-to-end)
+- Evaluation metrics (F1, grounding, confidence)
+
+---
+
+## 📊 Evaluation
+
+| Metric | Description | Method |
+|--------|-------------|--------|
+| **Parsing F1** | Accuracy of JSON extraction vs ground truth | Leaf-value comparison |
+| **API Grounding** | % of drugs resolved in RxNorm/DailyMed | Per-drug API check |
+| **Diagnosis Confidence** | High (full text) / Medium (abbreviation) / Low (inferred) | Rule-based |
+| **Hallucination Rate** | Unsupported claims in LLM answers | LLM fact-checking |
+| **Overall Confidence** | min(all stage confidences) | Conservative floor |
+
+Run `python tests/test_evaluation.py` to evaluate on sample prescriptions.
 
 ---
 

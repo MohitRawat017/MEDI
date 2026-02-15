@@ -1,7 +1,43 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, AlertCircle } from 'lucide-react';
+import { Send, Loader2, AlertCircle, ShieldCheck, ShieldAlert } from 'lucide-react';
 import Message from './Message';
 import { askPrescription } from '../services/api';
+
+// ==============================
+// Hallucination Warning Component
+// ==============================
+const HallucinationBanner = ({ check }) => {
+    if (!check || check.hallucination_count === 0) {
+        return (
+            <div className="flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1.5 rounded-md mx-4 -mt-2 mb-2">
+                <ShieldCheck size={12} />
+                <span>Answer grounded in prescription & API data</span>
+            </div>
+        );
+    }
+
+    return (
+        <div className="mx-4 -mt-2 mb-2 space-y-1">
+            <div className="flex items-center gap-1.5 text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-md">
+                <ShieldAlert size={12} />
+                <span>
+                    {check.hallucination_count} unsupported claim{check.hallucination_count > 1 ? 's' : ''} detected
+                </span>
+            </div>
+            {check.hallucinations?.map((h, idx) => (
+                <div key={idx} className="text-xs bg-amber-50/50 border border-amber-100 rounded-md px-3 py-1.5 ml-5">
+                    <span className={`font-medium ${h.severity === 'High' ? 'text-red-600' :
+                            h.severity === 'Medium' ? 'text-amber-600' : 'text-yellow-600'
+                        }`}>
+                        [{h.severity}]
+                    </span>
+                    <span className="text-gray-600 ml-1">{h.claim}</span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 
 const PrescriptionChat = ({ sessionId }) => {
     const [messages, setMessages] = useState([
@@ -11,6 +47,7 @@ const PrescriptionChat = ({ sessionId }) => {
             sources: []
         }
     ]);
+    const [hallucinationChecks, setHallucinationChecks] = useState({});
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
@@ -41,11 +78,20 @@ const PrescriptionChat = ({ sessionId }) => {
         try {
             const response = await askPrescription(sessionId, userMessage);
 
+            const newMsgIndex = messages.length + 1; // +1 for user msg we just added
             setMessages(prev => [...prev, {
                 type: 'bot',
                 text: response.answer || "I couldn't generate an answer. Please try again.",
                 sources: []
             }]);
+
+            // Store hallucination check for this message
+            if (response.hallucination_check) {
+                setHallucinationChecks(prev => ({
+                    ...prev,
+                    [newMsgIndex]: response.hallucination_check
+                }));
+            }
         } catch (error) {
             console.error("Error asking prescription question:", error);
             setMessages(prev => [...prev, {
@@ -74,7 +120,13 @@ const PrescriptionChat = ({ sessionId }) => {
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
                 {messages.map((msg, index) => (
-                    <Message key={index} message={msg} />
+                    <React.Fragment key={index}>
+                        <Message message={msg} />
+                        {/* Show hallucination check after bot messages */}
+                        {msg.type === 'bot' && hallucinationChecks[index] && (
+                            <HallucinationBanner check={hallucinationChecks[index]} />
+                        )}
+                    </React.Fragment>
                 ))}
 
                 {/* Quick Questions (show only at the start) */}

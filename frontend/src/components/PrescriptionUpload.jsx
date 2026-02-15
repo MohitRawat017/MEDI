@@ -1,13 +1,166 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Image, Check, AlertCircle, Loader2, User as UserIcon, Pill, Calendar, Stethoscope } from 'lucide-react';
+import {
+    Upload, Image, Check, AlertCircle, Loader2,
+    User as UserIcon, Pill, Calendar, Stethoscope,
+    AlertTriangle, Shield, ShieldAlert, Activity, BarChart3
+} from 'lucide-react';
 import { uploadPrescription } from '../services/api';
 
+// ==============================
+// Confidence Badge Component
+// ==============================
+const ConfidenceBadge = ({ level }) => {
+    const colors = {
+        High: 'bg-green-100 text-green-700 border-green-200',
+        Medium: 'bg-amber-100 text-amber-700 border-amber-200',
+        Low: 'bg-red-100 text-red-700 border-red-200',
+    };
+    return (
+        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${colors[level] || colors.Low}`}>
+            {level}
+        </span>
+    );
+};
+
+// ==============================
+// Confidence Scores Section
+// ==============================
+const ConfidenceSection = ({ confidence }) => {
+    if (!confidence) return null;
+
+    const coveragePercent = confidence.api_grounding_coverage || 0;
+    const coverageColor = coveragePercent >= 80 ? 'bg-green-500' : coveragePercent >= 50 ? 'bg-amber-500' : 'bg-red-500';
+
+    return (
+        <div className="bg-indigo-50 rounded-lg p-3 space-y-2">
+            <h4 className="text-xs font-semibold text-indigo-600 uppercase tracking-wide flex items-center gap-1.5">
+                <BarChart3 size={12} /> Confidence Scores
+            </h4>
+
+            <div className="space-y-2">
+                {/* Overall */}
+                <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Overall Confidence</span>
+                    <ConfidenceBadge level={confidence.overall_confidence} />
+                </div>
+
+                {/* Diagnosis */}
+                <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Diagnosis</span>
+                    <ConfidenceBadge level={confidence.diagnosis_confidence} />
+                </div>
+                {confidence.diagnosis_reason && (
+                    <p className="text-xs text-gray-500 ml-2">↳ {confidence.diagnosis_reason}</p>
+                )}
+
+                {/* API Grounding */}
+                <div className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">API Grounding</span>
+                        <span className="text-xs font-medium text-gray-700">{coveragePercent}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div
+                            className={`h-1.5 rounded-full ${coverageColor} transition-all`}
+                            style={{ width: `${coveragePercent}%` }}
+                        />
+                    </div>
+                </div>
+
+                {/* Per-drug scores */}
+                {confidence.medication_scores?.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                        <p className="text-xs font-medium text-gray-500">Medication Normalization:</p>
+                        {confidence.medication_scores.map((med, idx) => (
+                            <div key={idx} className="flex items-center justify-between text-xs bg-white rounded-md px-2.5 py-1.5 border border-indigo-100">
+                                <span className="text-gray-700">{med.name}</span>
+                                <div className="flex items-center gap-1.5">
+                                    {med.rxnorm_match && <span className="text-green-600" title="RxNorm match">Rx✓</span>}
+                                    {med.dailymed_match && <span className="text-blue-600" title="DailyMed match">DM✓</span>}
+                                    <ConfidenceBadge level={med.normalization} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// ==============================
+// Drug Interactions Section
+// ==============================
+const InteractionsSection = ({ interactions }) => {
+    if (!interactions || interactions.interactions_found === 0) {
+        return (
+            <div className="bg-green-50 rounded-lg p-3">
+                <div className="flex items-center gap-1.5 text-sm text-green-700">
+                    <Shield size={14} />
+                    <span className="font-medium">No drug interactions detected</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">{interactions?.disclaimer}</p>
+            </div>
+        );
+    }
+
+    const riskColors = {
+        High: { bg: 'bg-red-50 border-red-200', icon: 'text-red-600', text: 'text-red-700' },
+        Moderate: { bg: 'bg-amber-50 border-amber-200', icon: 'text-amber-600', text: 'text-amber-700' },
+        Low: { bg: 'bg-yellow-50 border-yellow-200', icon: 'text-yellow-600', text: 'text-yellow-700' },
+    };
+
+    return (
+        <div className="space-y-2">
+            <h4 className="text-xs font-semibold text-red-600 uppercase tracking-wide flex items-center gap-1.5">
+                <ShieldAlert size={12} /> Drug Interactions ({interactions.interactions_found})
+            </h4>
+
+            {interactions.interactions.map((interaction, idx) => {
+                const colors = riskColors[interaction.risk_level] || riskColors.Low;
+                return (
+                    <div key={idx} className={`rounded-lg p-3 border ${colors.bg}`}>
+                        <div className="flex items-start gap-2">
+                            <AlertTriangle size={14} className={`mt-0.5 ${colors.icon} flex-shrink-0`} />
+                            <div className="space-y-1 flex-1">
+                                <div className="flex items-center justify-between">
+                                    <span className={`text-sm font-medium ${colors.text}`}>
+                                        {interaction.drug_pair?.join(' ↔ ')}
+                                    </span>
+                                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${interaction.risk_level === 'High' ? 'bg-red-200 text-red-800' :
+                                            interaction.risk_level === 'Moderate' ? 'bg-amber-200 text-amber-800' :
+                                                'bg-yellow-200 text-yellow-800'
+                                        }`}>
+                                        {interaction.risk_level} Risk
+                                    </span>
+                                </div>
+                                <p className="text-xs text-gray-700">{interaction.description}</p>
+                                {interaction.recommendation && (
+                                    <p className="text-xs text-gray-500 italic">→ {interaction.recommendation}</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
+
+            <p className="text-xs text-gray-400 italic mt-1">{interactions.disclaimer}</p>
+        </div>
+    );
+};
+
+
+// ==============================
+// Main Component
+// ==============================
 const PrescriptionUpload = ({ onSessionCreated }) => {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [uploadStatus, setUploadStatus] = useState(null);
     const [prescriptionData, setPrescriptionData] = useState(null);
+    const [confidence, setConfidence] = useState(null);
+    const [interactions, setInteractions] = useState(null);
     const fileInputRef = useRef(null);
 
     const handleFileChange = (e) => {
@@ -16,8 +169,9 @@ const PrescriptionUpload = ({ onSessionCreated }) => {
             setFile(selected);
             setUploadStatus(null);
             setPrescriptionData(null);
+            setConfidence(null);
+            setInteractions(null);
 
-            // Create image preview
             const reader = new FileReader();
             reader.onloadend = () => setPreview(reader.result);
             reader.readAsDataURL(selected);
@@ -33,6 +187,8 @@ const PrescriptionUpload = ({ onSessionCreated }) => {
             const result = await uploadPrescription(file);
             setUploadStatus('success');
             setPrescriptionData(result.prescription_data);
+            setConfidence(result.confidence);
+            setInteractions(result.interactions);
             onSessionCreated(result.session_id, result.prescription_data);
         } catch (error) {
             console.error("Prescription upload failed", error);
@@ -47,6 +203,8 @@ const PrescriptionUpload = ({ onSessionCreated }) => {
         setPreview(null);
         setUploadStatus(null);
         setPrescriptionData(null);
+        setConfidence(null);
+        setInteractions(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
@@ -128,6 +286,12 @@ const PrescriptionUpload = ({ onSessionCreated }) => {
                         <Check size={14} />
                         Prescription analyzed successfully
                     </div>
+
+                    {/* Confidence Scores */}
+                    <ConfidenceSection confidence={confidence} />
+
+                    {/* Drug Interactions */}
+                    <InteractionsSection interactions={interactions} />
 
                     {/* Patient Info */}
                     {prescriptionData.patient_info && (
