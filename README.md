@@ -64,6 +64,42 @@ It is a **multimodal medical reasoning system.**
 
 ---
 
+## 🔬 OCR Benchmark Results
+
+Benchmarked **LightOnOCR-2-1B** against **GLM-OCR** across 6 diverse prescription formats. LightOn achieved higher structured extraction F1 and medication recall on oncology prescriptions.
+
+### Performance Comparison
+
+| Engine | CER ↓ | WER ↓ | Layout Score ↑ | Structured F1 ↑ | Med Recall ↑ |
+|--------|-------|-------|----------------|-----------------|---------------|
+| **LightOnOCR-2-1B** | 1.886 | 1.876 | **0.789** | 0.833 | **0.500** |
+| **GLM-OCR** | **0.929** | **1.127** | 0.616 | **0.946** | 0.417 |
+
+*Lower is better for CER/WER, higher is better for other metrics*
+
+### Per-Prescription Breakdown (Structured F1)
+
+| Prescription Type | LightOnOCR | GLM-OCR | Notes |
+|------------------|------------|---------|-------|
+| **DOD** (Military) | 1.00 | 1.00 | Both perfect |
+| **TALAT** (Certificate) | 1.00 | 1.00 | Both perfect |
+| **ASHOK** (Pediatric) | 1.00 | 1.00 | Both perfect |
+| **SANJEEV** (Complex) | 0.00 | 0.92 | GLM handles complexity better |
+| **BAKER** (Historical) | 1.00 | 1.00 | Both perfect |
+| **ORIGINAL** (Oncology) | **1.00** | 0.75 | **LightOn excels on cancer prescriptions** |
+
+### Key Findings
+
+- **GLM-OCR** achieves better character/word recognition (50% lower error rates)
+- **LightOnOCR** preserves layout structure better (+28% layout score)
+- **LightOnOCR** shows superior performance on oncology/cancer hospital prescriptions
+- Both engines achieve perfect structured extraction on standard prescription formats
+- GLM-OCR more robust on complex multi-medication prescriptions
+
+*Full evaluation methodology: Character Error Rate (CER), Word Error Rate (WER), Layout Preservation, Medication Detection Recall, Structured JSON F1 via Groq gpt-oss-120b*
+
+---
+
 ### 🔹 General Medical Q&A Mode (RAG)
 
 ```

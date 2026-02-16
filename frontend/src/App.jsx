@@ -10,9 +10,28 @@ function App() {
     const [sessionId, setSessionId] = useState(null)
     const [prescriptionData, setPrescriptionData] = useState(null)
 
+    // Lifted state: persists across tab switches, resets on new upload
+    const [chatMessages, setChatMessages] = useState([
+        {
+            type: 'bot',
+            text: 'Your prescription has been analyzed! Ask me anything about the medications, dosages, diagnosis, or follow-up instructions.',
+            sources: []
+        }
+    ])
+    const [hallucinationChecks, setHallucinationChecks] = useState({})
+
     const handleSessionCreated = (sid, data) => {
         setSessionId(sid)
         setPrescriptionData(data)
+        // Reset chat for the new prescription
+        setChatMessages([
+            {
+                type: 'bot',
+                text: 'Your prescription has been analyzed! Ask me anything about the medications, dosages, diagnosis, or follow-up instructions.',
+                sources: []
+            }
+        ])
+        setHallucinationChecks({})
     }
 
     const tabs = [
@@ -54,25 +73,27 @@ function App() {
                     })}
                 </div>
 
-                {/* Knowledge Base Tab */}
-                {activeTab === 'knowledge' && (
-                    <>
-                        <FileUpload />
-                        <div className="h-[600px]">
-                            <ChatArea />
-                        </div>
-                    </>
-                )}
+                {/* Knowledge Base Tab — hidden via CSS, stays mounted */}
+                <div style={{ display: activeTab === 'knowledge' ? 'block' : 'none' }}>
+                    <FileUpload />
+                    <div className="h-[600px] mt-6">
+                        <ChatArea />
+                    </div>
+                </div>
 
-                {/* Prescription Tab */}
-                {activeTab === 'prescription' && (
-                    <>
-                        <PrescriptionUpload onSessionCreated={handleSessionCreated} />
-                        <div className="h-[600px]">
-                            <PrescriptionChat sessionId={sessionId} />
-                        </div>
-                    </>
-                )}
+                {/* Prescription Tab — hidden via CSS, stays mounted */}
+                <div style={{ display: activeTab === 'prescription' ? 'block' : 'none' }}>
+                    <PrescriptionUpload onSessionCreated={handleSessionCreated} />
+                    <div className="h-[600px] mt-6">
+                        <PrescriptionChat
+                            sessionId={sessionId}
+                            messages={chatMessages}
+                            setMessages={setChatMessages}
+                            hallucinationChecks={hallucinationChecks}
+                            setHallucinationChecks={setHallucinationChecks}
+                        />
+                    </div>
+                </div>
 
             </div>
         </div>

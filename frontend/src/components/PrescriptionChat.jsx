@@ -27,7 +27,7 @@ const HallucinationBanner = ({ check }) => {
             {check.hallucinations?.map((h, idx) => (
                 <div key={idx} className="text-xs bg-amber-50/50 border border-amber-100 rounded-md px-3 py-1.5 ml-5">
                     <span className={`font-medium ${h.severity === 'High' ? 'text-red-600' :
-                            h.severity === 'Medium' ? 'text-amber-600' : 'text-yellow-600'
+                        h.severity === 'Medium' ? 'text-amber-600' : 'text-yellow-600'
                         }`}>
                         [{h.severity}]
                     </span>
@@ -39,15 +39,7 @@ const HallucinationBanner = ({ check }) => {
 };
 
 
-const PrescriptionChat = ({ sessionId }) => {
-    const [messages, setMessages] = useState([
-        {
-            type: 'bot',
-            text: 'Your prescription has been analyzed! Ask me anything about the medications, dosages, diagnosis, or follow-up instructions.',
-            sources: []
-        }
-    ]);
-    const [hallucinationChecks, setHallucinationChecks] = useState({});
+const PrescriptionChat = ({ sessionId, messages, setMessages, hallucinationChecks, setHallucinationChecks }) => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
@@ -78,20 +70,21 @@ const PrescriptionChat = ({ sessionId }) => {
         try {
             const response = await askPrescription(sessionId, userMessage);
 
-            const newMsgIndex = messages.length + 1; // +1 for user msg we just added
-            setMessages(prev => [...prev, {
-                type: 'bot',
-                text: response.answer || "I couldn't generate an answer. Please try again.",
-                sources: []
-            }]);
-
-            // Store hallucination check for this message
-            if (response.hallucination_check) {
-                setHallucinationChecks(prev => ({
-                    ...prev,
-                    [newMsgIndex]: response.hallucination_check
-                }));
-            }
+            setMessages(prev => {
+                const newIndex = prev.length; // index of the bot message we're about to add
+                // Store hallucination check for this message
+                if (response.hallucination_check) {
+                    setHallucinationChecks(hc => ({
+                        ...hc,
+                        [newIndex]: response.hallucination_check
+                    }));
+                }
+                return [...prev, {
+                    type: 'bot',
+                    text: response.answer || "I couldn't generate an answer. Please try again.",
+                    sources: []
+                }];
+            });
         } catch (error) {
             console.error("Error asking prescription question:", error);
             setMessages(prev => [...prev, {

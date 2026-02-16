@@ -1,0 +1,479 @@
+[
+  {
+    "name": "DOD",
+    "engine": "glm",
+    "cer": 0.5539568345323741,
+    "wer": 0.8028169014084507,
+    "layout_score": 0.8709677419354839,
+    "medication_recall": 0.5,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.5,
+    "dose_acc": 1.0,
+    "date_acc": 1.0,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": "John R. Doe",
+      "extracted_prescriber": "Jack R. Frost",
+      "extracted_medications": [
+        {
+          "name": "Tr Belleadonna",
+          "dose": "15 ml",
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Amphogel",
+          "dose": "120 ml",
+          "frequency": null,
+          "duration": null
+        }
+      ],
+      "patient_name_correct": true,
+      "prescriber_correct": true,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "Patient name and prescriber matched despite extra titles/commas; medication names had minor spelling variations (e.g., 'Tr Belleadonna' vs 'Tr. Belladonna') but were correctly identified, and doses matched."
+    },
+    "ocr_text": "DD FORM 1289\n1 NOV 71\nDOD PRESCRIPTION\n\nFOR (Full name, address, & phone number) (If under 12, give age)\nJohn R. Doe, HM3, USN\n\nU.S.S. Neverforgotten (DD 178)\n\nMEDICAL FACILITY\nU.S.S. Neverforgotten (DD 178)\n\nDATE\n23 JAN 99\n\nR (Superscription)\ngm or ml.\n(Inscription)\nTr Belleadonna\n15 ml\nAmphogel gsad\n120 ml\n\n(Subscription)\nM & FT Solution\n\n(Signa)\nSeg: 5mL tid a.c.\n\nMFGR: Wyeth\nEXP DATE: 12/02\n\nLOT NO: P39K106\nFILLED BY: KMT\n\nR NUMBER 10072\n\nJack R. Frost\nLCDR. M.D. USWR\nSIGNATURE RANK AND DEGR"
+  },
+  {
+    "name": "TALAT",
+    "engine": "glm",
+    "cer": 0.5298013245033113,
+    "wer": 0.704225352112676,
+    "layout_score": 0.8125,
+    "medication_recall": 1.0,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 1.0,
+    "dose_acc": 1.0,
+    "date_acc": 0.5,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": "Sheeba Marik",
+      "extracted_prescriber": "Dr. Talat Aziz",
+      "extracted_medications": [],
+      "patient_name_correct": false,
+      "prescriber_correct": true,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "Patient name spelling differs (\"Sheeba Marik\" vs \"Sheeba Malik\"); prescriber matches; no medications present as expected."
+    },
+    "ocr_text": "Dr. Talat Aziz\nM.B.B.S.(Delhi)\n\nCLINIC: 1430, Qasimjan Street, Ballimaran, Delhi-110006 Tel.: 23928493\ne-mail: azizclinic@hotmail.com\n\nRef. No. ..... Date: 18-8-10\n\nMedical Certificati\n\nThis is to certify that Ms\nSheeba Marik, whose Signature\nis given below, is a follow up case\nof Schalice with Protace\ndisease and under my care. I\nam her compli beeder for\n3 months 10 for 18-8-18 to 18-11-10\n\nDr. TALAT AZIZ\nM.B.B.S.\nRegd. No. MCI A809\n1430, Qasimjan St.\nBallimaran Delhi-6\n\nFACILITIES:\n★ VACCINATI"
+  },
+  {
+    "name": "ASHOK",
+    "engine": "glm",
+    "cer": 0.5294117647058824,
+    "wer": 0.6739130434782609,
+    "layout_score": 0.5,
+    "medication_recall": 0.6666666666666666,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.6666666666666666,
+    "dose_acc": 1.0,
+    "date_acc": 1.0,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": null,
+      "extracted_prescriber": null,
+      "extracted_medications": [
+        {
+          "name": "Sinmol DS",
+          "dose": "4 mL",
+          "frequency": "SOS",
+          "duration": null
+        },
+        {
+          "name": "Mucolite LS",
+          "dose": "2.5 mL",
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Meftal-P",
+          "dose": "1 tab",
+          "frequency": "SOS",
+          "duration": null
+        }
+      ],
+      "patient_name_correct": true,
+      "prescriber_correct": false,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "Patient name correctly identified as null. Prescriber name could not be reliably extracted from OCR (text is garbled), so marked incorrect. All three medication names were identified (allowing fuzzy matching), yielding perfect precision, recall, and F1. Frequency and duration fields are partially missing or inferred."
+    },
+    "ocr_text": "डाट अस्थानक गुप्ता\nM.B.B.S., M.D.\n(वाले रोग विचारक)\nReg. No. 32286\n\nवल्लभक : जमान मोदीनागर (8445897172)\n\nदिनाके ..... 04 NOV 2019\n\nR10 Govind Prasad\n\nSnp. Snmof ΔS - 4 ml\n4 ml 14 holy\nSnp. Mucolite LS 2.5 ml\nTab. Meftal-P 1 tab S08\nReview\n\n07 NOV 2019\n\nIf as adv.\n× 5d.\nReview"
+  },
+  {
+    "name": "SANJEEV",
+    "engine": "glm",
+    "cer": 1.7613636363636365,
+    "wer": 2.1272727272727274,
+    "layout_score": 0.3125,
+    "medication_recall": 0.0,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.0,
+    "dose_acc": 0.0,
+    "date_acc": 0.0,
+    "structured_f1": 0.9230769230769231,
+    "structured_detail": {
+      "extracted_patient_name": "Aarne",
+      "extracted_prescriber": "Dr. Sanjeev Kumar Sharma",
+      "extracted_medications": [
+        {
+          "name": "Cef-P",
+          "dose": null,
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Eklo-P",
+          "dose": null,
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Alb M",
+          "dose": null,
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Renzyo",
+          "dose": null,
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Asthalin",
+          "dose": null,
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Duolin",
+          "dose": null,
+          "frequency": null,
+          "duration": null
+        }
+      ],
+      "patient_name_correct": false,
+      "prescriber_correct": true,
+      "med_precision": 1.0,
+      "med_recall": 0.8571428571428571,
+      "med_f1": 0.9230769230769231,
+      "field_level_notes": "Patient name extracted as 'Aarne' does not match ground truth 'Aarav'. Prescriber correctly identified as Dr. Sanjeev Kumar Sharma. Medication names were inferred from garbled OCR text with fuzzy matching, yielding 6 extracted meds of which 6 match ground truth (Cef-P, Eklo-P, Alb M, Renzyo, Asthalin, Duolin); Budecort was not found."
+    },
+    "ocr_text": "Dr. Sanjeev Kumar Sharma\nM.B.B.S., M.D., (Ped.)\nChild Specialist\nCMO Regd. No. 2093/2623\n\nDr. Bharat Kumar Sharma\nDCH, MD, MRCP, FNNF (Neonatology)\nFellowship in Perinatology & Neonatology (NNF)\nPhone: 0532-2423450\n\nRx\nDate 11.11.19\n\nAarne\n165\n\nA tay p shul 444\nA Ehl PD shul 888\nA Ach M shul 1222\nA Reenyo 100 shul 244\n\n1311.19\n\nNebuch Qual 2uy\nAnshil 0.0y\n\nBy Dusare 2uel 1.0y\n\nतोकाकरण शानिवर, इत्यादि सोमवर को नहीं होता 1 समाधार के सोथे 4 दिन तोकाकरण होता है 1\n\nनमबर के लिए lybrate.com पर log करें"
+  },
+  {
+    "name": "BAKER",
+    "engine": "glm",
+    "cer": 0.8421052631578947,
+    "wer": 1.125,
+    "layout_score": 0.375,
+    "medication_recall": 0.0,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.0,
+    "dose_acc": 0.0,
+    "date_acc": 1.0,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": null,
+      "extracted_prescriber": null,
+      "extracted_medications": [
+        {
+          "name": "Cannabis",
+          "dose": null,
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Croton chloral",
+          "dose": "gr XV",
+          "frequency": null,
+          "duration": null
+        }
+      ],
+      "patient_name_correct": true,
+      "prescriber_correct": false,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "Patient name correctly identified as null. Prescriber not found in OCR text, so prescriber extraction is incorrect. Both medications from ground truth were identified (Cannabis approximating Ext. Cannabis Ind., and Croton chloral with correct dose)."
+    },
+    "ocr_text": "R. Sick headache\n\nFor\n\nTest cannabis and\nCroton chlorot\nIf capo no xv1.\nSay Give one dose repeat in\n½ hour\n\nM. D.\n\nCOLUMBIA\nColumbia 84\n\nTAKE THIS TO CAMERON'S DRUG STORE\n\nHILLMAN\nEast 4390 Columbia 44"
+  },
+  {
+    "name": "ORIGINAL",
+    "engine": "glm",
+    "cer": 1.3586206896551725,
+    "wer": 1.3289473684210527,
+    "layout_score": 0.8275862068965517,
+    "medication_recall": 0.3333333333333333,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.3333333333333333,
+    "dose_acc": 1.0,
+    "date_acc": 0.0,
+    "structured_f1": 0.75,
+    "structured_detail": {
+      "extracted_patient_name": "Dalia Kundu",
+      "extracted_prescriber": "Tanmoy Kumar Mandal",
+      "extracted_medications": [
+        {
+          "name": "Xgeva",
+          "dose": "120",
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Dexa",
+          "dose": null,
+          "frequency": "BD",
+          "duration": "D2-D4"
+        },
+        {
+          "name": "Ondiam",
+          "dose": null,
+          "frequency": "BD",
+          "duration": "D2-D4"
+        },
+        {
+          "name": "Ultracel",
+          "dose": null,
+          "frequency": "BD",
+          "duration": "5 days"
+        }
+      ],
+      "patient_name_correct": true,
+      "prescriber_correct": true,
+      "med_precision": 0.75,
+      "med_recall": 0.75,
+      "med_f1": 0.75,
+      "field_level_notes": "Patient name and prescriber extracted correctly. Medication names largely match ground truth with minor spelling variations (Ondiam≈Ondan, Ultracel≈Ultracet). One extra medication (Dexa) does not correspond to any ground‑truth entry, reducing precision and recall to 0.75."
+    },
+    "ocr_text": "Doctor Prescription\n\nPatient Name: Dalia Kundu\nMR No: NCRI/21/1427\nSex: F\nHeight/Weight: /\n\nConsultant Name: Tanmoy Kumar Mandal\nAppointment Date: 10/02/2021\nAge: 64\nBP / Pulse / Oxygen: //\n\nHistory / Symptoms:\n\nMBC\nClinical Examination: (8/5/3)\n(Bone/Kung/Liver)\n\nDiagnosis: 2D Echo - $\\textcircled{n}$\n\nMedicine Prescribed: Plan!-\n- G# (P+H)\n- Inj Xgeva - alt# (120)\n\nAdv\n$\\textcircled{1}$ CBC\n$\\textcircled{2}$ Give G (P+H) on 10/2/21\n\nAdvice Prescribed: Adv on Dio\n- HMW - TDS\n- Closen-TDS\n- T. D"
+  },
+  {
+    "name": "DOD",
+    "engine": "lighton",
+    "cer": 0.7266187050359713,
+    "wer": 1.0985915492957747,
+    "layout_score": 0.8709677419354839,
+    "medication_recall": 0.5,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.5,
+    "dose_acc": 1.0,
+    "date_acc": 1.0,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": "John R. Doe",
+      "extracted_prescriber": "Jack R Frost",
+      "extracted_medications": [
+        {
+          "name": "Tr Billedonna",
+          "dose": "15 ml",
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Amphogel gpad",
+          "dose": "120 ml",
+          "frequency": null,
+          "duration": null
+        }
+      ],
+      "patient_name_correct": true,
+      "prescriber_correct": true,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "Patient name and prescriber match ground truth despite minor punctuation differences. Medication names have slight spelling variations but are considered correct matches; doses extracted correctly. No frequency or duration information present."
+    },
+    "ocr_text": "DD FORM 1289  \n1 NOV 71  \n\n**DOD PRESCRIPTION**\n\nFOR (Full name, address, & phone number) (If under 12, give age)  \nJohn R. Doe, HM3, USN  \n\nU.S.S. Neverforgotten (DD 178)  \n\n<table>\n  <tr>\n    <td>MEDICAL FACILITY<br>U.S.S. Neverforgotten (DD 178)</td>\n    <td>DATE<br>23 Jan 99</td>\n  </tr>\n</table>\n\n**R** (Superscription)  \n(Inscription)  \nTr Billedonna  \nAmphogel gpad  \n\ngm or ml.  \n15 ml  \n120 ml  \n\n(Subscription)  \nM + FT Solution  \n\n(Signa)  \nSeg: 5ml tid a.c.  \n\n<table>\n  <tr>\n    <td>MFG"
+  },
+  {
+    "name": "TALAT",
+    "engine": "lighton",
+    "cer": 0.6158940397350994,
+    "wer": 0.6619718309859155,
+    "layout_score": 0.875,
+    "medication_recall": 1.0,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 1.0,
+    "dose_acc": 1.0,
+    "date_acc": 1.0,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": "Sheeba Malik",
+      "extracted_prescriber": "Dr. Talat Aziz",
+      "extracted_medications": [],
+      "patient_name_correct": true,
+      "prescriber_correct": true,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "All fields matched correctly; no medications listed."
+    },
+    "ocr_text": "Mob.: 9899874855\n\nDr. Talat Aziz  \nM.B.B.S. (Delhi)\n\nCLINIC: 1430, Qasimjan Street, Ballimaran, Delhi-110006 Tel.: 23928493  \ne-mail: azizclinic@hotmail.com\n\nRef. No. ________________________  \nDate: 18-8-10\n\n*Medical Certificate*\n\nThis is to certify that Ms. Sheeba Malik, whose signature is given below is a follow-up case of Schialica with Prototype disc and is under my care. I am her complaint based for 3 months i.e for 18-8-18 to 18-11-18\n\nSheeba  \n(Signature)\n\nDr. TALAT AZIZ  \nM.B.B.S.  \nReg"
+  },
+  {
+    "name": "ASHOK",
+    "engine": "lighton",
+    "cer": 3.7478991596638656,
+    "wer": 3.130434782608696,
+    "layout_score": 0.5,
+    "medication_recall": 0.6666666666666666,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.6666666666666666,
+    "dose_acc": 0.3333333333333333,
+    "date_acc": 1.0,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": null,
+      "extracted_prescriber": "Dr Ashok Gupta",
+      "extracted_medications": [
+        {
+          "name": "Sinmol DS",
+          "dose": "4 mL",
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Mucolite LS",
+          "dose": "2.5 mL",
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Meftal-P",
+          "dose": "1 tab",
+          "frequency": null,
+          "duration": null
+        }
+      ],
+      "patient_name_correct": true,
+      "prescriber_correct": true,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "Prescriber correctly identified despite minor punctuation difference. Patient name correctly absent (null). All three medications were extracted with correct names and doses; frequency and duration were not present in OCR, so left null."
+    },
+    "ocr_text": "# डो अशोक गुप्ता\n\nM.B.B.S., M.D.  \n(बाल रोग विशेषज्ञ)  \nReg. No. 32286\n\nक्लानक: अन्यर रोग विशेषज्ञ, मोदीनगर (१४४४५४९७१७२)\n\nदिनांक........... 04 NOV 2019\n\n$\\frac{\\text{Secret}}{3yrf.}$\n\n$\\frac{2}{10}$ Gorind Pnn\n\n$\\frac{1}{6}$ force sold.  \nAR!\n\n$\\frac{3}{d}$\n\n$\\begin{array}{l}\n\\text{Sup. Smol } \\Delta \\ell \\quad 4 \\text{ ml} \\\\\n\\text{Sup. Mucolite LS} \\quad 2.5 \\text{ ml} \\\\\n\\text{Tab. Meftal-P} \\quad 0 \\\\\n\\text{1 tab see} \\quad x \\times x \\\\\n\\text{- Review} \\quad \\text{do.}\n\\end{array}$\n\n$\\frac"
+  },
+  {
+    "name": "SANJEEV",
+    "engine": "lighton",
+    "cer": 2.7045454545454546,
+    "wer": 2.8181818181818183,
+    "layout_score": 0.625,
+    "medication_recall": 0.0,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.0,
+    "dose_acc": 0.0,
+    "date_acc": 0.0,
+    "structured_f1": 0.0,
+    "structured_detail": {
+      "extracted_patient_name": "Aarno",
+      "extracted_prescriber": "Dr. Sanjeev Kumar Sharma",
+      "extracted_medications": [],
+      "patient_name_correct": false,
+      "prescriber_correct": true,
+      "med_precision": 0.0,
+      "med_recall": 0.0,
+      "med_f1": 0.0,
+      "field_level_notes": "Patient name extracted as 'Aarno' which does not match ground truth 'Aarav'. Prescriber correctly identified. No recognizable medication entries could be parsed from the OCR text, resulting in zero precision, recall, and F1 for the medication list."
+    },
+    "ocr_text": "डॉ॰ संजीव कुमार शर्मा  \nDr. Sanjeev Kumar Sharma  \nM.B.B.S., M.D., (Ped.)  \nChild Specialist  \nCMO Regd. No. 2093/2623  \n\nडॉ॰ भरत कुमार शर्मा  \nDr. Bharat Kumar Sharma  \nDCH, MD, MRCP, FNNF (Neonatology)  \nFellowship in Perinatology & Neonatology (NNF)  \nPhone : 0532-2423450  \n\n$\\mathcal{R}_x$  \n$\\text{Aarno}$  \n$\\text{Date } 11.11.19$\n\n$\\text{Crel. } 92, - 15m \\text{ eff}$  \n$\\text{7p- 1D}$  \n$166$\n\n$\\text{12. A - layp 5ml wak} \\leftarrow \\text{by 205}$  \n$\\text{A Ehlh 10 5ml 3212} \\leftarrow \\"
+  },
+  {
+    "name": "BAKER",
+    "engine": "lighton",
+    "cer": 1.1929824561403508,
+    "wer": 1.375,
+    "layout_score": 1.0,
+    "medication_recall": 0.0,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.0,
+    "dose_acc": 0.5,
+    "date_acc": 1.0,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": null,
+      "extracted_prescriber": "Dr. W. P. Baker",
+      "extracted_medications": [
+        {
+          "name": "Ext. Cannabis Ind.",
+          "dose": "gr IV",
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Croton chloral",
+          "dose": "gr XV",
+          "frequency": null,
+          "duration": null
+        }
+      ],
+      "patient_name_correct": true,
+      "prescriber_correct": true,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "Patient name correctly identified as null. Prescriber matches despite case/period differences. Both medications extracted with correct names and doses; minor OCR spelling errors were normalized."
+    },
+    "ocr_text": "Phone, Ind. Columbia 36\n\nDR. W. P. BAKER  \nPhysician and Surgeon\n\nOffice and Residence, Keefe Building  \nHillman City, Seattle\n\nR. *Such headache*\n\nFor\n\n*let. Cannabis Ind.*  \n*croton chlorol.*  \n*gl caps. no xvi.*  \n*Sig. Give one tablet & repeat in ½ hour*\n\ngr 1v.  \ngr xvi. 27\n\nM. D.\n\nCOLUMBIA  \nColumbia 84\n\nTAKE THIS TO CAMERON'S DRUG STORE\n\nHILLMAN  \nEast 4390 Columbia 44"
+  },
+  {
+    "name": "ORIGINAL",
+    "engine": "lighton",
+    "cer": 2.331034482758621,
+    "wer": 2.1710526315789473,
+    "layout_score": 0.8620689655172413,
+    "medication_recall": 0.8333333333333334,
+    "numeric_dosage_acc": 1.0,
+    "drug_acc": 0.8333333333333334,
+    "dose_acc": 1.0,
+    "date_acc": 1.0,
+    "structured_f1": 1.0,
+    "structured_detail": {
+      "extracted_patient_name": "Dalia Kundu",
+      "extracted_prescriber": "Tanmoy Kumar Mandal",
+      "extracted_medications": [
+        {
+          "name": "Xgeva",
+          "dose": "120",
+          "frequency": null,
+          "duration": null
+        },
+        {
+          "name": "Dora",
+          "dose": null,
+          "frequency": "BD",
+          "duration": "D2-D4"
+        },
+        {
+          "name": "Ondan",
+          "dose": null,
+          "frequency": "BD",
+          "duration": "D2-D4"
+        },
+        {
+          "name": "Ultracet",
+          "dose": null,
+          "frequency": "BD",
+          "duration": "5 days"
+        }
+      ],
+      "patient_name_correct": true,
+      "prescriber_correct": true,
+      "med_precision": 1.0,
+      "med_recall": 1.0,
+      "med_f1": 1.0,
+      "field_level_notes": "Patient name and prescriber were correctly identified. All four medications from the ground truth (Xgeva, Dora, Ondan, Ultracet) were extracted with correct names; dose, frequency, and duration were captured where present in the OCR text."
+    },
+    "ocr_text": "![image](image_1.png)\n\n$\\text{Admit Form}$\n\n$\\text{12/2/2}$\n\n$\\text{NATH}$\n\n$\\text{PRE ACCREDITED}$\n\n$\\text{SATHI CLEAR}$\n\n$\\text{MISCECH}$\n\n$\\text{SAMS}$\n\n$\\text{NETAJI SUBHAS CHANDRA BOSE}$\n\n$\\text{CANCER HOSPITAL}$\n\n$\\text{(A Unit of Himadri Memorial Cancer Welfare Trust)}$\n\n$\\text{3081 Nayabad, Kolkata - 700 094, India}$\n\n$\\text{Help Desk : (033) 71223000 • Mob : 9874210003 // 9874210007}$\n\n$\\text{Email : info@nscri.in , admin@nscri.in, Web : www.nscri.in}$\n\n$\\text{NCR021/1427}$\n\n$\\text{Doct"
+  }
+]
