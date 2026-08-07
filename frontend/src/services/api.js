@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000';
+// Same-origin by default: the Vite dev server and the production nginx both
+// proxy the API routes to the backend. Override with VITE_API_URL when the
+// frontend and backend live on different origins (e.g. Render static site).
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const api = axios.create({
     baseURL: API_URL,

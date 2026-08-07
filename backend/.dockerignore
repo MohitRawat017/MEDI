@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+uploaded_pdfs/
+uploaded_prescriptions/
+app.log
+*.log
+.git/
+tests/__pycache__/
+tests/*.png
+tests/*.jpg
+tests/*.webp

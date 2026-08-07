@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import requests
 
+import modules.config as config
 from modules.confidence_scorer import compute_grounding_coverage
 from modules.evaluation import compute_parsing_f1
 from modules.medical_api import (
@@ -26,6 +27,16 @@ from modules.medical_api import (
 
 PASS = "PASS"
 FAIL = "FAIL"
+
+
+def test_env_defaults():
+    # Import-time defaults must hold when no env vars override them.
+    return (
+        config.PINECONE_ENV == "us-east-1"
+        and config.PINECONE_INDEX_NAME == "medi"
+        and config.UPLOAD_DIR == "./uploaded_pdfs"
+        and config.ALLOWED_ORIGINS == "*"
+    )
 
 
 def test_grounding_coverage():
@@ -100,6 +111,7 @@ def main():
     print("=" * 60)
 
     tests = [
+        ("Env config defaults", test_env_defaults),
         ("Grounding coverage", test_grounding_coverage),
         ("Parsing F1", test_parsing_f1),
         ("API failure contract (malformed payload)", test_api_failure_contract),

@@ -57,4 +57,4 @@ requests  # HTTP client
 #   pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu126
 
 # ==============================================================
-transformers == 5.0.0
+transformers>=4.44,<5  # LightOnOCR classes are 4.x-era; 5.x may move them

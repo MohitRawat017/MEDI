@@ -1,0 +1,43 @@
+# Render Blueprint - https://render.com/docs/blueprint-spec
+# Deploy with: render blueprint launch (or connect this repo in the dashboard)
+#
+# The backend is a ~3GB Docker image (CPU-only torch). The RAG path fits
+# Render's free tier (512MB RAM), but the OCR engine (LightOnOCR-2-1B,
+# ~4.2GB weights) does NOT - use a paid instance (>=4GB RAM) or GPU for
+# prescription uploads. Expect slow first requests (model downloads, cold
+# starts after 15 min idle).
+
+services:
+  - type: web
+    name: medi-backend
+    runtime: docker
+    repo: https://github.com/MohitRawat017/MEDI
+    plan: free
+    dockerContext: ./backend
+    dockerfilePath: Dockerfile
+    healthCheckPath: /docs
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false # set in the Render dashboard
+      - key: PINECONE_API_KEY
+        sync: false # set in the Render dashboard
+      - key: UPLOAD_DIR
+        value: /opt/render/project/uploaded_pdfs
+      # After the frontend deploys, set this to its URL:
+      #   https://medi-frontend.onrender.com
+      # (or leave unset for same-origin via nginx when self-hosting)
+      - key: ALLOWED_ORIGINS
+        sync: false
+
+  - type: web
+    name: medi-frontend
+    runtime: static
+    repo: https://github.com/MohitRawat017/MEDI
+    plan: free
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      # Backend URL is created after the backend service deploys.
+      # Set it to https://medi-backend.onrender.com in the dashboard.
+      - key: VITE_API_URL
+        sync: false

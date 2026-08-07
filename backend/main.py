@@ -14,17 +14,21 @@ from routes.upload_pdf import router as upload_router
 from routes.ask_question import router as ask_router
 from routes.upload_prescription import router as upload_prescription_router
 from routes.ask_prescription import router as ask_prescription_router
+from modules.config import ALLOWED_ORIGINS
 
 app = FastAPI(
     title="Medical Assistant API",
     description="API for AI Medical Assistant Chatbot"
 )
 
-# Allow all origins for development; restrict to frontend domains in production
+# CORS: comma-separated origins via ALLOWED_ORIGINS ("*" allows all).
+# Credentials are only meaningful for specific origins, so they are enabled
+# whenever the wildcard is not in use.
+allowed_origins = [o.strip() for o in ALLOWED_ORIGINS.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials="*" not in allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"]
 )

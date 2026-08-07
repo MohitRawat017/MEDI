@@ -4,6 +4,8 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
 ![LLM](https://img.shields.io/badge/LLM-Groq-purple)
 ![OCR](https://img.shields.io/badge/OCR-LightOnOCR-orange)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ed)
+![CI](https://github.com/MohitRawat017/MEDI/actions/workflows/ci.yml/badge.svg)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 
 > OCR-powered prescription understanding + Live Drug Knowledge APIs  
@@ -143,44 +145,50 @@ LLM Grounded Answer
 Medical_Chatbot/
 ├── backend/
 │   ├── modules/
+│   │   ├── config.py                     # Central env config (keys, Pinecone, uploads)
 │   │   ├── ocr.py                        # OCR extraction (lazy loading)
 │   │   ├── prescription_parser.py        # LLM-based parsing
 │   │   ├── medical_api.py                # RxNorm/DailyMed/RxClass/OpenFDA
 │   │   ├── api_answer_chain.py           # Prescription Q&A chain
-│   │   ├── confidence_scorer.py          # 🆕 Confidence scoring
-│   │   ├── drug_interaction_checker.py   # 🆕 Drug interaction detection
-│   │   ├── evaluation.py                 # 🆕 F1/grounding/hallucination
-│   │   ├── session_store.py              # Session storage + metadata
-│   │   ├── llm.py                        # RAG LLM
+│   │   ├── confidence_scorer.py          # Confidence scoring
+│   │   ├── drug_interaction_checker.py   # Drug interaction detection
+│   │   ├── evaluation.py                 # F1/grounding/hallucination
+│   │   ├── session_store.py              # In-memory session storage
+│   │   ├── llm.py                        # Lazy ChatGroq factory
 │   │   ├── retrieval.py                  # Pinecone retrieval + reranking
 │   │   └── load_vectorstore.py           # PDF ingestion
-│   │
 │   ├── routes/
 │   │   ├── upload_prescription.py        # POST /upload_prescription/
 │   │   ├── ask_prescription.py           # POST /ask_prescription/
 │   │   ├── upload_pdf.py                 # POST /upload_pdfs/
-│   │   └── ask_question.py              # POST /ask/
-│   │
+│   │   └── ask_question.py               # POST /ask/
 │   ├── tests/
+│   │   ├── test_logic.py                 # 🆕 Pure-logic tests (runs in CI, no keys)
+│   │   ├── test_evaluation.py            # Evaluation metrics (live APIs)
 │   │   ├── test_prescription_pipeline.py
-│   │   ├── test_evaluation.py            # 🆕 Evaluation metrics
 │   │   ├── test_api_endpoints.py
 │   │   └── run_all_tests.py
-│   │
 │   ├── main.py
+│   ├── Dockerfile
 │   └── requirements.txt
 │
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── PrescriptionUpload.jsx     # + confidence & interactions UI
-    │   │   ├── PrescriptionChat.jsx       # + hallucination banners
-    │   │   ├── FileUpload.jsx
-    │   │   └── ChatArea.jsx
-    │   ├── services/
-    │   │   └── api.js
-    │   └── App.jsx
-    └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── PrescriptionUpload.jsx    # + confidence & interactions UI
+│   │   │   ├── PrescriptionChat.jsx      # + hallucination banners
+│   │   │   ├── FileUpload.jsx
+│   │   │   └── ChatArea.jsx
+│   │   ├── services/
+│   │   │   └── api.js
+│   │   └── App.jsx
+│   ├── Dockerfile
+│   ├── nginx.conf                       # API reverse proxy + SPA fallback
+│   └── package.json
+│
+├── docker-compose.yml                   # 🆕 One-command local stack
+├── render.yaml                          # 🆕 Render blueprint (deploy)
+└── .github/workflows/ci.yml             # 🆕 Lint + logic tests + optional live tests
 ```
 
 ---
@@ -291,7 +299,7 @@ namespace: "medical_kb"
 ## ⚙️ Tech Stack
 
 **Backend:**
-- Python 3.10+
+- Python 3.12+
 - FastAPI
 - LightOnOCR 2.1B
 - Groq LLM (via LangChain)
@@ -312,40 +320,90 @@ namespace: "medical_kb"
 
 ## 🚀 Quick Start
 
-### 1️⃣ Backend Setup
+### Option A — Docker Compose (recommended)
+
+```bash
+# 1. Configure secrets (one time)
+cp backend/.env.example .env
+# ... edit .env and paste your GROQ_API_KEY + PINECONE_API_KEY
+
+# 2. Build and run the whole stack
+docker compose up --build
+```
+
+Visit `http://localhost` (frontend) and `http://localhost:8000/docs` (API docs).
+Models download from HuggingFace on first use (persisted in a volume).
+
+### Option B — Local development
+
+**Backend:**
 
 ```bash
 cd backend
-
-# Create virtual environment
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Install dependencies
+# For GPU support, install torch first:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu126
 pip install -r requirements.txt
 
-# Create .env file
-echo "GROQ_API_KEY=your_groq_key" >> .env
-echo "PINECONE_API_KEY=your_pinecone_key" >> .env
-echo "HF_TOKEN=your_huggingface_token" >> .env
-
-# Run server
+cp .env.example .env   # then add your keys
 uvicorn main:app --reload --port 8000
 ```
 
-### 2️⃣ Frontend Setup
+**Frontend** (the Vite dev server proxies API calls to `localhost:8000`):
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Run dev server
 npm run dev
 ```
 
 Visit `http://localhost:5173` (frontend) and `http://localhost:8000/docs` (API docs).
+
+### 🔑 Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `GROQ_API_KEY` | ✅ | — | Groq LLM key (backend) |
+| `PINECONE_API_KEY` | ✅ | — | Pinecone vector DB key (backend) |
+| `PINECONE_ENV` | ❌ | `us-east-1` | Pinecone region |
+| `PINECONE_INDEX_NAME` | ❌ | `medi` | Pinecone index name |
+| `ALLOWED_ORIGINS` | ❌ | `*` | Comma-separated CORS origins |
+| `UPLOAD_DIR` | ❌ | `./uploaded_pdfs` | Where uploaded files are saved |
+| `VITE_API_URL` | ❌ | same-origin | Frontend → backend base URL (frontend) |
+
+---
+
+## ☁️ Deployment (Render)
+
+A [Render blueprint](render.yaml) is included: a Docker web service for the backend and a static site for the frontend.
+
+1. Push this repo to GitHub and create a Render account.
+2. In Render: **New → Blueprint** and point it at the repo (or run `render blueprint launch`).
+3. Set the dashboard secrets (marked `sync: false` in the blueprint):
+   - Backend: `GROQ_API_KEY`, `PINECONE_API_KEY`, and `ALLOWED_ORIGINS` = your frontend URL (e.g. `https://medi-frontend.onrender.com`)
+   - Frontend: `VITE_API_URL` = `https://medi-backend.onrender.com`
+
+> ⚠️ **Free tier limits — read this first.** Render's free web service allows **512MB RAM**, but the OCR engine (LightOnOCR-2-1B) needs ~4.2GB of weights alone. On the free tier:
+> - ✅ General Q&A (RAG) works — mpnet + MiniLM reranker fit in ~260MB.
+> - ❌ **Prescription OCR will crash with out-of-memory.**
+> - To run OCR you need a paid instance (≥4GB RAM) or a GPU instance. Also expect the service to spin down after ~15 min idle and model weights to download on first use.
+>
+> For a quick demo on free hardware, use the RAG mode (upload PDFs → ask) or run the full stack locally with Docker Compose.
+
+---
+
+## 🤖 CI / CD
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every push/PR:
+
+- **Backend** — syntax check + `tests/test_logic.py` (pure logic, mocked APIs, no keys)
+- **Frontend** — `npm ci` → lint → production build
+
+A third **live-tests** job runs only when triggered manually (Actions → **Run workflow** → tick **run_live**) and exercises the real RxNorm/DailyMed grounding, Groq LLM, and Pinecone connection. It needs `GROQ_API_KEY` and `PINECONE_API_KEY` configured as repository secrets.
+
+---
 
 ---
 
@@ -377,6 +435,9 @@ Visit `http://localhost:5173` (frontend) and `http://localhost:8000/docs` (API d
 - [x] Evaluation framework (F1, grounding, hallucination metrics)
 
 ### Phase 4 🔮
+- [x] Containerization (Docker + Compose)
+- [x] Render deployment blueprint
+- [x] CI/CD pipeline (lint, logic tests, optional live tests)
 - [ ] Persistent storage (Redis / PostgreSQL)
 - [ ] Multi-visit longitudinal tracking
 - [ ] Contraindication alerts
@@ -389,13 +450,13 @@ Visit `http://localhost:5173` (frontend) and `http://localhost:8000/docs` (API d
 ```bash
 cd backend/tests
 
+# Pure-logic tests (no keys, CI-safe - also runs in GitHub Actions)
+python test_logic.py
+
 # Run all tests
 python run_all_tests.py
 
-# Run specific test
-python test_prescription_pipeline.py
-
-# Run evaluation metrics
+# Run evaluation metrics (live RxNorm/DailyMed calls)
 python test_evaluation.py
 ```
 
