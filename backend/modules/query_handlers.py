@@ -30,12 +30,6 @@ def query_chain(user_input: str, namespace: str):
     try:
         logger.debug(f"Running chain for input: {user_input}")
 
-        # ============================================================
-        # STEP 1: RETRIEVE RELEVANT CHUNKS
-        # ============================================================
-        # Uses hybrid retrieval:
-        # - Dense retrieval: Get top 7 chunks via vector similarity
-        # - Reranking: Use cross-encoder to refine to top 4 most relevant
         documents = retrieve_with_rerank(
             query=user_input,
             namespace=namespace
@@ -47,26 +41,13 @@ def query_chain(user_input: str, namespace: str):
                 "source": []
             }
 
-        # ============================================================
-        # STEP 2: BUILD CONTEXT
-        # ============================================================
-        # Combine retrieved chunks into single context string
-        # This context will be inserted into the LLM prompt
         context = "\n\n".join([doc["text"] for doc in documents])
 
-        # ============================================================
-        # STEP 3: GENERATE ANSWER
-        # ============================================================
-        # Send context + question to LLM for answer generation
         answer = generate_answer(
             question=user_input,
             context=context
         )
 
-        # ============================================================
-        # STEP 4: FORMAT RESPONSE
-        # ============================================================
-        # Extract source file paths from document metadata
         response = {
             "response": answer,
             "source": [
@@ -78,53 +59,6 @@ def query_chain(user_input: str, namespace: str):
         logger.debug("Query processed successfully")
         return response
 
-    except Exception as e:
+    except Exception:
         logger.exception("Error in query chain")
         raise
-
-
-# ============================================================
-# ALTERNATIVE APPROACH: Using LangChain Chains
-# ============================================================
-# Instead of manual retrieval + generation, you can use LangChain's
-# built-in chains that automate the RAG pipeline
-#
-# from langchain.chains import create_retrieval_chain
-#
-# def query_chain_with_langchain(user_input: str, chain):
-#     """
-#     Alternative implementation using LangChain's retrieval chain
-#
-#     Args:
-#         user_input (str): User's question
-#         chain: Pre-built LangChain retrieval chain (LCEL or RetrievalQA)
-#
-#     Returns:
-#         dict: Response with answer and sources
-#
-#     How it works internally:
-#         1. Chain receives query
-#         2. Retriever fetches relevant documents from vector DB
-#         3. Documents are combined and inserted into prompt template
-#         4. LLM generates answer based on prompt
-#         5. Returns result with source documents
-#     """
-#     try:
-#         # For LCEL chains: use invoke()
-#         result = chain.invoke({"query": user_input})
-#
-#         # For RetrievalQA: result format is {"result": answer, "source_documents": [...]}
-#         response = {
-#             "response": result["result"],
-#             "sources": [
-#                 doc.metadata.get("source", "")
-#                 for doc in result["source_documents"]
-#             ]
-#         }
-#
-#         logger.debug(f"Chain response: {response}")
-#         return response
-#
-#     except Exception as e:
-#         logger.exception("Error in query chain")
-#         raise

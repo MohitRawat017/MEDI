@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Upload, FileText, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { uploadPDF } from '../services/api';
 

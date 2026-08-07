@@ -12,29 +12,14 @@ Since the RxNorm Interaction API was discontinued (Jan 2024), we use
 drug class overlap + LLM reasoning + OpenFDA adverse event signals.
 """
 
-import os
 import json
 from itertools import combinations
-from dotenv import load_dotenv
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
+from modules.llm import GPT_OSS_120B, get_chat_groq
 from modules.medical_api import fetch_drug_classes, fetch_openfda_interactions
 from logger import setup_logger
 
 logger = setup_logger(__name__)
-
-load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-# ==============================
-# LLM for interaction analysis
-# ==============================
-
-llm = ChatGroq(
-    api_key=GROQ_API_KEY,
-    model="openai/gpt-oss-120b",
-    temperature=0
-)
 
 interaction_prompt = ChatPromptTemplate.from_messages([
     ("system",
@@ -145,7 +130,7 @@ def check_interactions(medications: list[dict]) -> dict:
             "fda_signals": json.dumps(fda_signals, indent=2) if fda_signals else "No FDA signals found"
         })
 
-        response = llm.invoke(formatted_prompt)
+        response = get_chat_groq(GPT_OSS_120B).invoke(formatted_prompt)
         raw_output = response.content.strip()
 
         # Strip markdown code fences if present

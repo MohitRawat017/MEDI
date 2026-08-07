@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
+from logger import setup_logger
 from modules.session_store import get_session
 from modules.api_answer_chain import generate_api_answer
 from modules.evaluation import detect_hallucinations
 
+logger = setup_logger(__name__)
 router = APIRouter()
 
 
@@ -40,8 +42,9 @@ async def ask_prescription(
             "confidence": confidence
         }
 
-    except Exception as e:
+    except Exception:
+        logger.exception("Error generating prescription answer")
         return JSONResponse(
             status_code=500,
-            content={"error": str(e)}
+            content={"error": "Internal Server Error"}
         )

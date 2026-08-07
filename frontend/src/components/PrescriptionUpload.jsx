@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
     Upload, Image, Check, AlertCircle, Loader2,
     User as UserIcon, Pill, Calendar, Stethoscope,
@@ -153,7 +153,7 @@ const InteractionsSection = ({ interactions }) => {
 // ==============================
 // Main Component
 // ==============================
-const PrescriptionUpload = ({ onSessionCreated }) => {
+const PrescriptionUpload = ({ onSessionChange }) => {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [uploading, setUploading] = useState(false);
@@ -189,7 +189,7 @@ const PrescriptionUpload = ({ onSessionCreated }) => {
             setPrescriptionData(result.prescription_data);
             setConfidence(result.confidence);
             setInteractions(result.interactions);
-            onSessionCreated(result.session_id, result.prescription_data);
+            onSessionChange(result.session_id);
         } catch (error) {
             console.error("Prescription upload failed", error);
             setUploadStatus('error');
@@ -206,6 +206,8 @@ const PrescriptionUpload = ({ onSessionCreated }) => {
         setConfidence(null);
         setInteractions(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
+        // Clear the parent session so the prescription chat resets too
+        onSessionChange(null);
     };
 
     return (
@@ -353,6 +355,20 @@ const PrescriptionUpload = ({ onSessionCreated }) => {
                             </h4>
                             <ul className="text-sm text-gray-700 list-disc list-inside">
                                 {prescriptionData.follow_up.map((item, idx) => (
+                                    <li key={idx}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Advice */}
+                    {prescriptionData.advice?.length > 0 && (
+                        <div className="bg-teal-50 rounded-lg p-3">
+                            <h4 className="text-xs font-semibold text-teal-600 uppercase tracking-wide flex items-center gap-1.5 mb-1">
+                                <Activity size={12} /> Advice
+                            </h4>
+                            <ul className="text-sm text-gray-700 list-disc list-inside">
+                                {prescriptionData.advice.map((item, idx) => (
                                     <li key={idx}>{item}</li>
                                 ))}
                             </ul>

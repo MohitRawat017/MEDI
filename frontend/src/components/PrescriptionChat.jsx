@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { Fragment, useState, useRef, useEffect } from 'react';
 import { Send, Loader2, AlertCircle, ShieldCheck, ShieldAlert } from 'lucide-react';
 import Message from './Message';
 import { askPrescription } from '../services/api';
@@ -44,12 +44,8 @@ const PrescriptionChat = ({ sessionId, messages, setMessages, hallucinationCheck
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
-
     useEffect(() => {
-        scrollToBottom();
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
     const quickQuestions = [
@@ -63,6 +59,9 @@ const PrescriptionChat = ({ sessionId, messages, setMessages, hallucinationCheck
         const userMessage = (questionText || input).trim();
         if (!userMessage || isLoading) return;
 
+        // Bot message lands right after the user message we're about to append
+        const botIndex = messages.length + 1;
+
         setInput('');
         setMessages(prev => [...prev, { type: 'user', text: userMessage }]);
         setIsLoading(true);
@@ -70,21 +69,17 @@ const PrescriptionChat = ({ sessionId, messages, setMessages, hallucinationCheck
         try {
             const response = await askPrescription(sessionId, userMessage);
 
-            setMessages(prev => {
-                const newIndex = prev.length; // index of the bot message we're about to add
-                // Store hallucination check for this message
-                if (response.hallucination_check) {
-                    setHallucinationChecks(hc => ({
-                        ...hc,
-                        [newIndex]: response.hallucination_check
-                    }));
-                }
-                return [...prev, {
-                    type: 'bot',
-                    text: response.answer || "I couldn't generate an answer. Please try again.",
-                    sources: []
-                }];
-            });
+            if (response.hallucination_check) {
+                setHallucinationChecks(hc => ({
+                    ...hc,
+                    [botIndex]: response.hallucination_check
+                }));
+            }
+            setMessages(prev => [...prev, {
+                type: 'bot',
+                text: response.answer || "I couldn't generate an answer. Please try again.",
+                sources: []
+            }]);
         } catch (error) {
             console.error("Error asking prescription question:", error);
             setMessages(prev => [...prev, {
@@ -113,13 +108,13 @@ const PrescriptionChat = ({ sessionId, messages, setMessages, hallucinationCheck
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
                 {messages.map((msg, index) => (
-                    <React.Fragment key={index}>
+                    <Fragment key={index}>
                         <Message message={msg} />
                         {/* Show hallucination check after bot messages */}
                         {msg.type === 'bot' && hallucinationChecks[index] && (
                             <HallucinationBanner check={hallucinationChecks[index]} />
                         )}
-                    </React.Fragment>
+                    </Fragment>
                 ))}
 
                 {/* Quick Questions (show only at the start) */}

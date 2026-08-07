@@ -1,6 +1,6 @@
 # 🏥 AI Medical Assistant (Multimodal + Hybrid Intelligence)
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![Python](https://img.shields.io/badge/Python-3.12+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
 ![LLM](https://img.shields.io/badge/LLM-Groq-purple)
 ![OCR](https://img.shields.io/badge/OCR-LightOnOCR-orange)

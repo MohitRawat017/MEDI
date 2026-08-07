@@ -128,20 +128,47 @@ def _score_medications(medications: list[dict]) -> tuple[list[dict], list[dict]]
 # API Grounding Coverage
 # ==============================
 
-def _compute_grounding_coverage(api_results: list[dict]) -> float:
+def compute_grounding_coverage(api_results: list[dict]) -> dict:
     """
-    Percentage of medications successfully grounded in external APIs.
+    Compute how well the medications are grounded in external APIs.
     A drug is "grounded" if at least RxNorm OR DailyMed returned data.
+
+    Returns:
+        dict with coverage_percent, grounded_count, total_count, details
     """
     if not api_results:
-        return 0.0
+        return {
+            "coverage_percent": 0.0,
+            "grounded_count": 0,
+            "total_count": 0,
+            "details": []
+        }
 
-    grounded = sum(
-        1 for r in api_results
-        if r.get("rxnorm_id") or r.get("dailymed_info")
-    )
+    details = []
+    grounded = 0
 
-    return round((grounded / len(api_results)) * 100, 1)
+    for result in api_results:
+        drug = result.get("drug", "Unknown")
+        has_rxnorm = result.get("rxnorm_id") is not None
+        has_dailymed = result.get("dailymed_info") is not None
+        is_grounded = has_rxnorm or has_dailymed
+
+        if is_grounded:
+            grounded += 1
+
+        details.append({
+            "drug": drug,
+            "grounded": is_grounded,
+            "rxnorm": has_rxnorm,
+            "dailymed": has_dailymed
+        })
+
+    return {
+        "coverage_percent": round((grounded / len(api_results)) * 100, 1),
+        "grounded_count": grounded,
+        "total_count": len(api_results),
+        "details": details
+    }
 
 
 # ==============================
@@ -180,7 +207,7 @@ def compute_confidence(prescription_data: dict) -> tuple[dict, list[dict]]:
     med_scores, api_results = _score_medications(medications)
 
     # 3. API grounding
-    grounding_coverage = _compute_grounding_coverage(api_results)
+    grounding_coverage = compute_grounding_coverage(api_results)
 
     # 4. Overall = min(stage confidences)
     all_levels = [diagnosis_score["level"]]
@@ -196,7 +223,7 @@ def compute_confidence(prescription_data: dict) -> tuple[dict, list[dict]]:
         "diagnosis_confidence": diagnosis_score["level"],
         "diagnosis_reason": diagnosis_score["reason"],
         "medication_scores": med_scores,
-        "api_grounding_coverage": grounding_coverage,
+        "api_grounding_coverage": grounding_coverage["coverage_percent"],
         "overall_confidence": overall
     }
 

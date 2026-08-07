@@ -6,13 +6,20 @@ import requests
 # -----------------------------
 
 def fetch_rxnorm_id(drug_name: str):
-    url = f"https://rxnav.nlm.nih.gov/REST/rxcui.json?name={drug_name}"
-    r = requests.get(url)
-
-    if r.status_code != 200:
+    try:
+        r = requests.get(
+            "https://rxnav.nlm.nih.gov/REST/rxcui.json",
+            params={"name": drug_name},
+            timeout=10,
+        )
+        if r.status_code != 200:
+            return None
+        data = r.json()
+    except (requests.RequestException, ValueError):
         return None
 
-    data = r.json()
+    if not isinstance(data, dict):
+        return None
 
     if "idGroup" in data and "rxnormId" in data["idGroup"]:
         return data["idGroup"]["rxnormId"][0]
@@ -25,15 +32,19 @@ def fetch_rxnorm_id(drug_name: str):
 # -----------------------------
 
 def fetch_dailymed_summary(drug_name: str):
-    url = f"https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?drug_name={drug_name}"
-    r = requests.get(url)
-
-    if r.status_code != 200:
+    try:
+        r = requests.get(
+            "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json",
+            params={"drug_name": drug_name},
+            timeout=10,
+        )
+        if r.status_code != 200:
+            return None
+        data = r.json()
+    except (requests.RequestException, ValueError):
         return None
 
-    data = r.json()
-
-    if "data" not in data or len(data["data"]) == 0:
+    if not isinstance(data, dict) or not data.get("data"):
         return None
 
     # Get first match
@@ -55,18 +66,19 @@ def fetch_drug_classes(drug_name: str) -> list[str]:
     Fetch pharmacological classes for a drug via RxClass API.
     Returns list of class names (e.g., ["Anticoagulants", "Vitamin K Antagonists"]).
     """
-    url = (
-        f"https://rxnav.nlm.nih.gov/REST/rxclass/class/byDrugName.json"
-        f"?drugName={drug_name}&relaSource=ATC"
-    )
-
     try:
-        r = requests.get(url, timeout=10)
-
+        r = requests.get(
+            "https://rxnav.nlm.nih.gov/REST/rxclass/class/byDrugName.json",
+            params={"drugName": drug_name, "relaSource": "ATC"},
+            timeout=10,
+        )
         if r.status_code != 200:
             return []
 
         data = r.json()
+        if not isinstance(data, dict):
+            return []
+
         classes = []
 
         concept_groups = data.get("rxclassDrugInfoList", {}).get("rxclassDrugInfo", [])
@@ -77,7 +89,7 @@ def fetch_drug_classes(drug_name: str) -> list[str]:
 
         return classes
 
-    except Exception:
+    except (requests.RequestException, ValueError):
         return []
 
 
@@ -90,20 +102,25 @@ def fetch_openfda_interactions(drug_name: str) -> list[str]:
     Query OpenFDA drug adverse events for interaction-related reports.
     Returns list of reported interaction terms.
     """
-    url = (
-        f"https://api.fda.gov/drug/event.json"
-        f"?search=patient.drug.medicinalproduct:\"{drug_name}\""
-        f"+AND+patient.reaction.reactionmeddrapt:\"drug interaction\""
-        f"&limit=5"
-    )
-
     try:
-        r = requests.get(url, timeout=10)
-
+        r = requests.get(
+            "https://api.fda.gov/drug/event.json",
+            params={
+                "search": (
+                    f'patient.drug.medicinalproduct:"{drug_name}"'
+                    '+AND+patient.reaction.reactionmeddrapt:"drug interaction"'
+                ),
+                "limit": 5,
+            },
+            timeout=10,
+        )
         if r.status_code != 200:
             return []
 
         data = r.json()
+        if not isinstance(data, dict):
+            return []
+
         results = data.get("results", [])
         interactions = []
 
@@ -116,5 +133,5 @@ def fetch_openfda_interactions(drug_name: str) -> list[str]:
 
         return interactions
 
-    except Exception:
+    except (requests.RequestException, ValueError):
         return []

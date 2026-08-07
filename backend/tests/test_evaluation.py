@@ -12,8 +12,8 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from modules.evaluation import compute_parsing_f1, compute_grounding_coverage
-from modules.confidence_scorer import compute_confidence
+from modules.evaluation import compute_parsing_f1
+from modules.confidence_scorer import compute_confidence, compute_grounding_coverage
 
 
 # ==============================

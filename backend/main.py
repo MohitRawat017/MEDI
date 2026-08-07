@@ -1,16 +1,10 @@
-"""
-Medical Assistant API: FastAPI backend for AI-powered medical chatbot
-Uses RAG (Retrieval Augmented Generation) with Pinecone vector database
+"""Medical Assistant API: FastAPI backend for the AI-powered medical chatbot.
 
 Endpoints:
     - POST /upload_pdfs/: Upload and process PDF documents
     - POST /ask/: Query the system with medical questions
-
-Architecture:
-    - FastAPI web framework
-    - Pinecone for vector storage
-    - LangChain for RAG pipeline
-    - Groq for LLM inference
+    - POST /upload_prescription/: OCR + parse a prescription image
+    - POST /ask_prescription/: Ask about an uploaded prescription
 """
 
 from fastapi import FastAPI
@@ -21,37 +15,23 @@ from routes.ask_question import router as ask_router
 from routes.upload_prescription import router as upload_prescription_router
 from routes.ask_prescription import router as ask_prescription_router
 
-# Initialize FastAPI app
 app = FastAPI(
     title="Medical Assistant API",
     description="API for AI Medical Assistant Chatbot"
 )
 
-# ============================================================
-# CORS CONFIGURATION
-# ============================================================
-# Allow all origins for development
-# In production, restrict to specific frontend domains
+# Allow all origins for development; restrict to frontend domains in production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # List of allowed origins
-    allow_credentials=True,  # Allow cookies/auth headers
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"]  # Allow all headers
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
-
-# ============================================================
-# MIDDLEWARE
-# ============================================================
-# Global exception handler catches all unhandled errors
 app.middleware("http")(catch_exception_middleware)
 
-# ============================================================
-# ROUTERS
-# ============================================================
-# Register API routes
-app.include_router(upload_router)  # PDF upload endpoint
-app.include_router(ask_router)  # Question answering endpoint
-app.include_router(upload_prescription_router) # Prescription upload endpoint
-app.include_router(ask_prescription_router) # Prescription question answering endpoint
+app.include_router(upload_router)
+app.include_router(ask_router)
+app.include_router(upload_prescription_router)
+app.include_router(ask_prescription_router)

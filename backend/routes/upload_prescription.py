@@ -2,12 +2,14 @@ import uuid
 import os
 from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
+from logger import setup_logger
 from modules.ocr import extract_text_from_image
 from modules.prescription_parser import parse_prescription
 from modules.session_store import save_session
 from modules.confidence_scorer import compute_confidence
 from modules.drug_interaction_checker import check_interactions
 
+logger = setup_logger(__name__)
 router = APIRouter()
 
 UPLOAD_DIR = "./uploaded_prescriptions"
@@ -53,8 +55,9 @@ async def upload_prescription(file: UploadFile = File(...)):
             "confidence": confidence
         }
 
-    except Exception as e:
+    except Exception:
+        logger.exception("Error during prescription upload")
         return JSONResponse(
             status_code=500,
-            content={"error": str(e)}
+            content={"error": "Internal Server Error"}
         )

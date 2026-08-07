@@ -1,17 +1,6 @@
-import os
-from dotenv import load_dotenv
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
+from modules.llm import GPT_OSS_120B, get_chat_groq
 from modules.medical_api import fetch_rxnorm_id, fetch_dailymed_summary
-
-load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-llm = ChatGroq(
-    api_key=GROQ_API_KEY,
-    model="openai/gpt-oss-120b",
-    temperature=0
-)
 
 prompt = ChatPromptTemplate.from_messages([
     ("system",
@@ -63,6 +52,6 @@ def generate_api_answer(prescription_json: dict, question: str):
         "question": question
     })
 
-    response = llm.invoke(formatted_prompt)
+    response = get_chat_groq(GPT_OSS_120B).invoke(formatted_prompt)
 
     return response.content

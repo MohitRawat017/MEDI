@@ -12,7 +12,6 @@ langchain
 langchain-community
 langchain-core
 langchain-groq
-langchain-pinecone
 langchain-text-splitters
 
 # ============================================================
@@ -25,8 +24,6 @@ pinecone
 # ============================================================
 sentence-transformers
 huggingface-hub
-langchain-huggingface
-langchain-google-genai
 
 # ============================================================
 # PDF PARSING
@@ -47,7 +44,6 @@ torch
 python-dotenv  # Environment variable management
 pydantic  # Data validation
 requests  # HTTP client
-tqdm  # Progress bars
 
 # ============================================================
 # INSTALLATION NOTES

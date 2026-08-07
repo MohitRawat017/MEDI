@@ -5,32 +5,25 @@ import FileUpload from './components/FileUpload'
 import PrescriptionUpload from './components/PrescriptionUpload'
 import PrescriptionChat from './components/PrescriptionChat'
 
+const WELCOME_MESSAGE = {
+    type: 'bot',
+    text: 'Your prescription has been analyzed! Ask me anything about the medications, dosages, diagnosis, or follow-up instructions.',
+    sources: []
+}
+
 function App() {
     const [activeTab, setActiveTab] = useState('knowledge')
     const [sessionId, setSessionId] = useState(null)
-    const [prescriptionData, setPrescriptionData] = useState(null)
 
     // Lifted state: persists across tab switches, resets on new upload
-    const [chatMessages, setChatMessages] = useState([
-        {
-            type: 'bot',
-            text: 'Your prescription has been analyzed! Ask me anything about the medications, dosages, diagnosis, or follow-up instructions.',
-            sources: []
-        }
-    ])
+    const [chatMessages, setChatMessages] = useState([WELCOME_MESSAGE])
     const [hallucinationChecks, setHallucinationChecks] = useState({})
 
-    const handleSessionCreated = (sid, data) => {
+    // Called with a session id on upload, or null when the user discards the prescription
+    const handleSessionChange = (sid) => {
         setSessionId(sid)
-        setPrescriptionData(data)
         // Reset chat for the new prescription
-        setChatMessages([
-            {
-                type: 'bot',
-                text: 'Your prescription has been analyzed! Ask me anything about the medications, dosages, diagnosis, or follow-up instructions.',
-                sources: []
-            }
-        ])
+        setChatMessages([WELCOME_MESSAGE])
         setHallucinationChecks({})
     }
 
@@ -83,7 +76,7 @@ function App() {
 
                 {/* Prescription Tab — hidden via CSS, stays mounted */}
                 <div style={{ display: activeTab === 'prescription' ? 'block' : 'none' }}>
-                    <PrescriptionUpload onSessionCreated={handleSessionCreated} />
+                    <PrescriptionUpload onSessionChange={handleSessionChange} />
                     <div className="h-[600px] mt-6">
                         <PrescriptionChat
                             sessionId={sessionId}

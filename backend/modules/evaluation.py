@@ -3,7 +3,6 @@ Evaluation Framework
 
 Provides functions to evaluate the prescription pipeline:
 - Parsing F1: Compare parsed JSON fields against ground truth
-- API grounding coverage: % of drugs resolved in RxNorm/DailyMed
 - Hallucination detection: Check if LLM answer contains unsupported claims
 
 A hallucination is defined as:
@@ -12,23 +11,12 @@ A hallucination is defined as:
 - A side effect not supported by DailyMed data
 """
 
-import os
 import json
-from dotenv import load_dotenv
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from logger import setup_logger
+from modules.llm import GPT_OSS_120B, get_chat_groq
 
 logger = setup_logger(__name__)
-
-load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-llm = ChatGroq(
-    api_key=GROQ_API_KEY,
-    model="openai/gpt-oss-120b",
-    temperature=0
-)
 
 
 # ==============================
@@ -94,54 +82,6 @@ def compute_parsing_f1(predicted: dict, ground_truth: dict) -> dict:
         "matched": len(matched),
         "predicted_count": len(pred_values),
         "truth_count": len(truth_values)
-    }
-
-
-# ==============================
-# API Grounding Coverage
-# ==============================
-
-def compute_grounding_coverage(api_results: list[dict]) -> dict:
-    """
-    Compute how well the medications are grounded in external APIs.
-
-    Returns:
-        dict with coverage_percent, grounded_count, total_count, details
-    """
-    if not api_results:
-        return {
-            "coverage_percent": 0.0,
-            "grounded_count": 0,
-            "total_count": 0,
-            "details": []
-        }
-
-    details = []
-    grounded = 0
-
-    for result in api_results:
-        drug = result.get("drug", "Unknown")
-        has_rxnorm = result.get("rxnorm_id") is not None
-        has_dailymed = result.get("dailymed_info") is not None
-        is_grounded = has_rxnorm or has_dailymed
-
-        if is_grounded:
-            grounded += 1
-
-        details.append({
-            "drug": drug,
-            "grounded": is_grounded,
-            "rxnorm": has_rxnorm,
-            "dailymed": has_dailymed
-        })
-
-    coverage = round((grounded / len(api_results)) * 100, 1)
-
-    return {
-        "coverage_percent": coverage,
-        "grounded_count": grounded,
-        "total_count": len(api_results),
-        "details": details
     }
 
 
@@ -219,7 +159,7 @@ def detect_hallucinations(answer: str, prescription: dict, api_data: list) -> di
             "answer": answer
         })
 
-        response = llm.invoke(formatted_prompt)
+        response = get_chat_groq(GPT_OSS_120B).invoke(formatted_prompt)
         raw_output = response.content.strip()
 
         # Strip markdown code fences if present
